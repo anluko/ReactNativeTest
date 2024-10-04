@@ -1,10 +1,16 @@
-// components/Notification.js
 import React from "react";
-import { View, Text, Animated, StyleSheet } from "react-native";
+import { Text, Animated, StyleSheet } from "react-native";
+import { aligned } from "./responsive";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-const Notification = ({ type, message, fadeAnim }) => {
+type NotificationProps = {
+  type: "success" | "error";
+  message: string;
+  fadeAnim: Animated.Value;
+};
+
+const Notification: React.FC<NotificationProps> = ({ type, message, fadeAnim }) => {
   return (
     <Animated.View
       style={[
@@ -28,9 +34,9 @@ const Notification = ({ type, message, fadeAnim }) => {
 const styles = StyleSheet.create({
   notification: {
     position: "absolute",
-    bottom: 20,
+    bottom: aligned(20),
     alignSelf: "center",
-    padding: 10,
+    padding: aligned(10),
     width: "85%",
     flexDirection: "row",
     justifyContent: "space-around",
@@ -45,8 +51,8 @@ const styles = StyleSheet.create({
   notificationText: {
     color: "white",
     textAlign: "center",
-    fontSize: 16,
-    marginRight: 30,
+    fontSize: aligned(16),
+    marginRight: aligned(30),
   },
 });
 

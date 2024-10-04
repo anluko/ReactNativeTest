@@ -1,12 +1,21 @@
-import { React } from "react";
-import { StyleSheet, View, Text, TextInput } from "react-native";
-import { Controller } from "react-hook-form";
+import React from "react";
+import { StyleProp, StyleSheet, TextInput, TextInputProps, ViewStyle } from "react-native";
+import { Controller, Control, FieldValues } from "react-hook-form";
 
-const CommentInputController = ({
+interface CommentInputControllerProps {
+  control: Control<FieldValues, any>;
+  name: string;
+  placeholder: string;
+  onSubmitEditing?: TextInputProps["onSubmitEditing"];
+  style?: StyleProp<ViewStyle>; 
+}
+
+const CommentInputController: React.FC<CommentInputControllerProps> = ({
   control,
   name,
   placeholder,
   onSubmitEditing,
+  style
 }) => {
   return (
     <Controller

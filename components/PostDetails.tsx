@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  FlatList,
   ScrollView,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
@@ -14,13 +13,30 @@ import { deletePost } from "../store/postsAction";
 import { addComment } from "../store/commentsAction";
 import { getComments } from "../store/commentsAction";
 import { useForm } from "react-hook-form";
+import { RootState } from "../store/store";
+import { AppDispatch } from "../store/store";
+import { useNotification } from "../context/NotificationContext";
+import { aligned } from "../utils/responsive";
 import CommentListItem from "./CommentListItem";
 import CommentInputController from "../controllers/CommentInputController";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function PostDetails({ route, navigation }) {
-  const comments = useSelector((state) => state.comments.commentsList);
+interface PostDetailsProps {
+  route: {
+    params: {
+      id: number;
+      title: string;
+      body: string;
+    };
+  };
+  navigation: any;
+}
+
+export default function PostDetails({ route, navigation }: PostDetailsProps) {
+  const comments = useSelector(
+    (state: RootState) => state.comments.commentsList
+  );
   const {
     control,
     handleSubmit,
@@ -28,19 +44,27 @@ export default function PostDetails({ route, navigation }) {
     formState: { errors },
   } = useForm();
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const showNotification = useNotification().showNotification;
 
   useEffect(() => {
     dispatch(getComments(route.params.id));
   }, [dispatch, route.params.id]);
 
   const onSubmit = (data) => {
+    if (!data.comment || data.comment.trim() === "") {
+      showNotification("error", "Please input text!");
+      return;
+    }
+
     const newComment = {
       postId: route.params.id,
       body: data.comment,
       name: "user",
       email: "user@email.ru",
     };
+
+    console.log(newComment);
     dispatch(addComment(newComment));
     setValue("comment", "");
   };
@@ -59,8 +83,7 @@ export default function PostDetails({ route, navigation }) {
           style: "destructive",
           onPress: () => {
             dispatch(deletePost(route.params.id));
-            dispatch(addPost(data));
-            showNotification("success", "Успешно выполнено!");
+            showNotification("success", "Successfully deleted!");
             setTimeout(() => {
               navigation.navigate("StartScreen");
             }, 1500);
@@ -137,35 +160,34 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   scrollViewContent: {
-    paddingBottom: 100,
+    paddingBottom: aligned(100),
   },
   loadInfo: {
     alignItems: "stretch",
     width: "100%",
-    paddingHorizontal: 10,
+    paddingHorizontal: aligned(10),
   },
   image: {
     width: "100%",
-    height: 250,
+    height: aligned(250),
   },
   title: {
-    fontSize: 28,
+    fontSize: aligned(28),
     fontWeight: "bold",
-    alignItems: "left",
     textAlign: "left",
-    marginTop: 15,
-    paddingHorizontal: 10,
-    minHeight: 60,
+    marginTop: aligned(15),
+    paddingHorizontal: aligned(10),
+    minHeight: aligned(60),
     flexGrow: 1,
   },
   body: {
-    fontSize: 18,
+    fontSize: aligned(18),
     textAlign: "left",
-    marginTop: 20,
+    marginTop: aligned(20),
     fontWeight: "200",
-    paddingHorizontal: 10,
-    minHeight: 80,
-    lineHeight: 25,
+    paddingHorizontal: aligned(10),
+    minHeight: aligned(80),
+    lineHeight: aligned(25),
     flexGrow: 1,
   },
   commentInputView: {
@@ -173,7 +195,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     borderBottomWidth: 1,
-    marginBottom: 10,
+    marginBottom: aligned(10),
   },
   commentInput: {
     flex: 1,
@@ -187,53 +209,53 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
   },
   listView: {
-    paddingVertical: 20,
-    paddingHorizontal: 15,
+    paddingVertical: aligned(20),
+    paddingHorizontal: aligned(15),
     width: "100%",
     justifyContent: "center",
   },
   commentsText: {
-    fontSize: 22,
+    fontSize: aligned(22),
     fontWeight: "600",
-    paddingVertical: 10,
+    paddingVertical: aligned(10),
   },
   buttonView: {
     backgroundColor: "#ffff",
     flexDirection: "row",
     width: "100%",
-    height: 80,
+    height: aligned(80),
     position: "absolute",
     alignItems: "center",
     justifyContent: "space-between",
-    bottom: 0,
+    bottom: aligned(0),
   },
   deleteBtn: {
     backgroundColor: "#9C0D0D",
     height: "80%",
-    marginHorizontal: 15,
-    paddingHorizontal: 25,
+    marginHorizontal: aligned(15),
+    paddingHorizontal: aligned(25),
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 15,
+    borderRadius: aligned(15),
   },
   updateBtn: {
     backgroundColor: "#171515",
     height: "80%",
-    marginHorizontal: 15,
-    paddingHorizontal: 25,
+    marginHorizontal: aligned(15),
+    paddingHorizontal: aligned(25),
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 15,
+    borderRadius: aligned(15),
   },
   deleteText: {
-    fontSize: 18,
+    fontSize: aligned(18),
     textAlign: "center",
     color: "white",
   },
   updateText: {
-    fontSize: 18,
+    fontSize: aligned(18),
     textAlign: "center",
     color: "white",
   },

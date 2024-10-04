@@ -1,7 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StyleSheet, Text, Image, TouchableOpacity, View } from "react-native";
+import { Comment } from "../interfaces/Comment"
+import { aligned } from "../utils/responsive";
 
-export default function CommentListItem({ listItem, navigation }) {
+interface CommentListItemProps {
+  listItem: Comment;
+  navigation?: {
+    navigate: (screen: string, params?: any) => void;
+  };
+}
+
+const CommentListItem: React.FC<CommentListItemProps> = ({ listItem, navigation }) => {
   return (
     <TouchableOpacity style={styles.touchItem}>
       <View style={styles.itemsView}>
@@ -23,32 +32,34 @@ export default function CommentListItem({ listItem, navigation }) {
 const styles = StyleSheet.create({
   touchItem: {
     justifyContent: "center",
-    borderRadius: 15,
-    marginTop: 10,
+    borderRadius: aligned(15),
+    marginTop: aligned(10),
   },
   itemsView: {
     width: "100%",
     flexDirection: "row",
-    marginBottom: 10,
+    marginBottom: aligned(10),
     backgroundColor: "white",
     overflow: "hidden",
-    paddingVertical: 10,
+    paddingVertical: aligned(10),
   },
   image: {
-    width: 60,
-    height: 60,
+    width: aligned(60),
+    height: aligned(60),
   },
   nameAnons: {
     flex: 1,
-    paddingLeft: 10,
+    paddingLeft: aligned(10),
   },
   title: {
-    fontSize: 18,
+    fontSize: aligned(18),
     fontWeight: "500",
     textAlignVertical: "top",
   },
   body: {
-    fontSize: 14,
+    fontSize: aligned(14),
     textAlign: "left",
   },
 });
+
+export default CommentListItem;

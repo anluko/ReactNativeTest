@@ -1,7 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StyleSheet, Text, Image, TouchableOpacity, View } from "react-native";
+import { Post } from "../interfaces/Post"
+import { aligned } from "../utils/responsive";
 
-export default function PostListItem({ listItem, navigation }) {
+interface PostListItemProps {
+  listItem: Post;
+  navigation: {
+    navigate: (screen: string, params?: any) => void;
+  };
+}
+
+const PostListItem: React.FC<PostListItemProps> = ({ listItem, navigation }) => {
   return (
     <TouchableOpacity
       style={styles.touchItem}
@@ -27,31 +36,33 @@ export default function PostListItem({ listItem, navigation }) {
 const styles = StyleSheet.create({
   touchItem: {
     justifyContent: "center",
-    borderRadius: 15,
-    marginTop: 10,
+    borderRadius: aligned(15),
+    marginTop: aligned(10),
   },
   itemsView: {
     width: "100%",
-    marginBottom: 10,
+    marginBottom: aligned(10),
     backgroundColor: "white",
-    paddingHorizontal: 20,
-    paddingLeft: 10,
-    padding: 10,
+    paddingHorizontal: aligned(20),
+    paddingLeft: aligned(10),
+    padding: aligned(10),
     overflow: "hidden",
-    marginHorizontal: 10,
+    marginHorizontal: aligned(10),
   },
   image: {
     width: "100%",
-    height: 200,
+    height: aligned(200),
   },
   nameAnons: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 15,
+    marginTop: aligned(15),
   },
   title: {
-    fontSize: 20,
+    fontSize: aligned(20),
     textAlign: "left",
     color: "#474747",
   },
 });
+
+export default PostListItem;

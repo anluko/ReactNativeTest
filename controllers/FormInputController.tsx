@@ -1,8 +1,18 @@
-import { React } from "react";
-import { StyleSheet, View, Text, TextInput } from "react-native";
-import { Controller } from "react-hook-form";
+import React from "react";
+import { StyleSheet, TextInput } from "react-native";
+import { Controller, Control, FieldValues } from "react-hook-form";
 
-const FormInputController = ({ control, name, placeholder }) => {
+interface FormInputControllerProps {
+  control: Control<FieldValues, any>;
+  name: string;
+  placeholder: string;
+}
+
+const FormInputController: React.FC<FormInputControllerProps> = ({
+  control,
+  name,
+  placeholder,
+}) => {
   return (
     <Controller
       name={name}

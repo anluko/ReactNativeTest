@@ -1,13 +1,22 @@
 import React from "react";
 import { TouchableOpacity } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  StackNavigationProp,
+} from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import StartScreen from "./components/StartScreen";
-import PostDetails from "./components/PostDetails";
-import PostModify from "./components/PostModify";
+import StartScreen from "../components/StartScreen";
+import PostDetails from "../components/PostDetails";
+import PostModify from "../components/PostModify";
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  StartScreen: undefined;
+  PostDetailsScreen: undefined;
+  PostModifyScreen: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function Navigate() {
   return (
@@ -23,7 +32,14 @@ export default function Navigate() {
         <Stack.Screen
           name="PostDetailsScreen"
           component={PostDetails}
-          options={({ navigation }) => ({
+          options={({
+            navigation,
+          }: {
+            navigation: StackNavigationProp<
+              RootStackParamList,
+              "PostDetailsScreen"
+            >;
+          }) => ({
             headerTitle: "",
             headerStyle: {
               backgroundColor: "#343A30",
@@ -41,7 +57,14 @@ export default function Navigate() {
         <Stack.Screen
           name="PostModifyScreen"
           component={PostModify}
-          options={({ navigation }) => ({
+          options={({
+            navigation,
+          }: {
+            navigation: StackNavigationProp<
+              RootStackParamList,
+              "PostModifyScreen"
+            >;
+          }) => ({
             headerTitle: "",
             headerStyle: {
               backgroundColor: "#343A30",

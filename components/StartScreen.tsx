@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -15,21 +15,37 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNotification } from "../context/NotificationContext";
 import PostListItem from "./PostListItem";
 import { getPosts } from "../store/postsAction";
+import { RootState } from "../store/store";
+import { AppDispatch } from "../store/store";
+import { Post } from "../interfaces/Post";
+import { aligned } from "../utils/responsive";
 
-export default function StartScreen({ route, navigation }) {
-  const [searchText, setSearchText] = useState("");
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const posts = useSelector((state) => state.posts.postsList);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+interface StartScreenProps {
+  route: {
+    params: {
+      updatedPost?: Post;
+    };
+  };
+  navigation: {
+    navigate: (screen: string, params?: any) => void;
+  };
+}
+
+const StartScreen: React.FC<StartScreenProps> = ({ route, navigation }) => {
+  const [searchText, setSearchText] = useState<string>("");
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
+  const posts = useSelector((state: RootState) => state.posts.postsList);
+  const [page, setPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const limit = 5;
 
-  const dispatch = useDispatch();
-  const showNotification = useNotification();
+  const dispatch = useDispatch<AppDispatch>();
+  const showNotification = useNotification().showNotification;
 
   useEffect(() => {
-    loadPosts();
+    if (posts.length === 0) loadPosts();
+    else setFilteredPosts(posts);
   }, [dispatch]);
 
   const loadPosts = async () => {
@@ -39,9 +55,13 @@ export default function StartScreen({ route, navigation }) {
 
       if (!result) showNotification("error", "Произошла ошибка!");
 
-      if (result.payload.length < limit) {
+      const payload = result.payload as Post[];
+      if (payload.length < limit) {
         setHasMore(false);
       }
+
+      const combinedPosts = [...posts, ...payload];
+      setFilteredPosts(combinedPosts);
       setPage((prevPage) => prevPage + 1);
       setLoading(false);
     }
@@ -49,13 +69,15 @@ export default function StartScreen({ route, navigation }) {
 
   useEffect(() => {
     if (route.params?.updatedPost) {
-      const updatedPost = route.params.updatedPost;
+      const updatedPost: Post = route.params.updatedPost;
       const updatedPosts = posts.map((post) =>
         post.id === updatedPost.id ? updatedPost : post
       );
       setFilteredPosts(updatedPosts);
+    } else {
+      setFilteredPosts(posts);
     }
-  }, [route.params?.updatedPost]);
+  }, [route.params?.updatedPost, posts]);
 
   useEffect(() => {
     const filtered = posts.filter(
@@ -75,6 +97,14 @@ export default function StartScreen({ route, navigation }) {
     ) : null;
   };
 
+  const renderEmptyList = () => {
+    return (
+      <View style={styles.emptyList}>
+        <Text style={styles.emptyText}>No results</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchAreaView}>
@@ -85,7 +115,7 @@ export default function StartScreen({ route, navigation }) {
             style={styles.searchInput}
             placeholder="Search"
             value={searchText}
-            onChangeText={(text) => setSearchText(text)}
+            onChangeText={setSearchText}
             onSubmitEditing={Keyboard.dismiss}
             placeholderTextColor={"grey"}
           />
@@ -98,12 +128,13 @@ export default function StartScreen({ route, navigation }) {
           renderItem={({ item }) => (
             <PostListItem listItem={item} navigation={navigation} />
           )}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => `post-${item.id}`}
           onEndReached={() => {
             if (!loading && hasMore) loadPosts();
           }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
+          ListEmptyComponent={renderEmptyList}
           contentContainerStyle={{ paddingBottom: 200 }}
         />
       </View>
@@ -120,7 +151,7 @@ export default function StartScreen({ route, navigation }) {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -132,13 +163,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#343A30",
     alignItems: "center",
     width: "100%",
-    height: "13%",
+    height: Platform.OS === "android" ? aligned(120) : aligned(90),
   },
   searchView: {
-    marginTop: Platform.OS === "android" ? 60 : 35,
+    marginTop: Platform.OS === "android" ? aligned(60) : aligned(35),
     backgroundColor: "#D7D8D6",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: aligned(10),
     color: "black",
     width: "90%",
     flexDirection: "row",
@@ -146,15 +177,15 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     color: "black",
-    padding: 10,
+    padding: aligned(10),
   },
   searchInput: {
-    fontSize: 18,
+    fontSize: aligned(18),
     justifyContent: "center",
   },
   listView: {
     padding: 5,
-    paddingRight: 10,
+    paddingRight: aligned(10),
     width: "100%",
     height: "100%",
     backgroundColor: "#1F201D",
@@ -163,22 +194,39 @@ const styles = StyleSheet.create({
   buttonView: {
     backgroundColor: "#ffff",
     width: "100%",
-    height: 80,
+    height: aligned(80),
     position: "absolute",
     justifyContent: "center",
-    bottom: 0,
+    bottom: aligned(0),
   },
   addPostBtn: {
     backgroundColor: "#171515",
-    borderRadius: 15,
+    borderRadius: aligned(15),
     borderWidth: 1,
-    paddingVertical: 10,
-    marginHorizontal: 15,
+    paddingVertical: aligned(10),
+    marginHorizontal: aligned(15),
   },
   btnText: {
-    fontSize: 18,
+    fontSize: aligned(18),
     color: "white",
     textAlign: "center",
     padding: 5,
   },
+  loader: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: aligned(10),
+  },
+  emptyList: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: aligned(18),
+    textAlign: "center",
+    color: "white",
+  },
 });
+
+export default StartScreen;
